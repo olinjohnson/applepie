@@ -1,0 +1,26 @@
+[Event "Grand Chess Tour Croatia Rapid & Blitz 2021"]
+[Site ""]
+[Date "2021.07.10"]
+[Round "?"]
+[White "Garry Kasparov"]
+[Black "Anton Korobov"]
+[Result "0-1"]
+
+1. c4 e6 2. d4 d5 3. Nf3 Nf6 4. e3 Be7 5. Bd3 O-O 6. b3 b6 7. O-O Bb7 8. Bb2
+Nbd7 9. Nc3 a6 10. Rc1 Bd6 11. cxd5 exd5 12. Ne2 Re8 13. Ng3 Ne4 14. Qc2 Nxg3
+15. hxg3 Nf6 16. Ne5 Qe7 17. b4 Ne4 18. b5 axb5 19. Bxb5 Rec8 20. Nc6 Qg5 21. a4
+h5 22. Qe2 h4 23. gxh4 Qxh4 24. g3 Qg5 25. Rc2 Re8 26. Kg2 Re6 0-1[Event "Grand Chess Tour Croatia Rapid & Blitz 2021"]
+
+[Event "Grand Chess Tour Croatia Rapid & Blitz 2021"]
+[Site ""]
+[Date "2021.07.10"]
+[Round "?"]
+[White "Garry Kasparov"]
+[Black "Anish Giri"]
+[Result "0-1"]
+
+1. c4 Nf6 2. Nc3 e5 3. e3 Nc6 4. a3 d5 5. cxd5 Nxd5 6. Qc2 Nxc3 7. bxc3 Qd6 8.
+Bd3 Be6 9. Rb1 O-O-O 10. Be2 g5 11. Nf3 Be7 12. d4 Kb8 13. O-O g4 14. Nd2 f5 15.
+Nc4 Qd7 16. Rd1 Bd5 17. Bd3 Rhf8 18. a4 Qe6 19. Nd2 exd4 20. exd4 f4 21. Ne4 g3
+22. hxg3 fxg3 23. fxg3 h5 24. Bf4 h4 25. Re1 Qd7 26. Qb2 b6 27. Nc5 Bxc5 28.
+dxc5 Rxf4 29. cxb6 axb6 30. gxf4 h3 31. a5 Rg8 32. Bf1 hxg2 0-1
