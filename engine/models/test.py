@@ -27,11 +27,16 @@ def activation_softmax(inputs):
 
 
 np.set_printoptions(precision=4, suppress=True)
+
+arr1 = np.array([3, 4, 5])
+arr2 = np.array([1, 2, 1])
+print(np.square(arr1 - arr2) / len(arr1))
+
 # arr = np.array([[-1, 0.25, 1.2], [3, 5.6, 9]])
-arr = np.array([-1, 0.25, 1.2])
-s = activation_softmax(arr)
-print(s)
-print(np.sum(s))
+# arr = np.array([-1, 0.25, 1.2])
+# s = activation_softmax(arr)
+# print(s)
+# print(np.sum(s))
 
 # print(activation_tanh(arr))
 # print(activation_tanh_singular(0.6))
