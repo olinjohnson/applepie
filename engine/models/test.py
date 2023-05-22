@@ -1,36 +1,27 @@
 import numpy as np
 
 
-def activation_sigmoid(inputs):
-    return np.array([1 / (1 + np.exp(-i)) for i in inputs])
-
-
-def activation_sigmoid_singular(i):
-    return 1 / (1 + np.exp(-i))
-
-
-def activation_tanh(inputs):
-    ei, eni = np.exp(inputs), np.exp(-inputs)
-    return (ei - eni) / (ei + eni)
-
-
-def activation_tanh_singular(inputs):
-    ei, eni = np.exp(inputs), np.exp(-inputs)
-    return (ei - eni) / (ei + eni)
-
-
-# def activation_softmax(inputs):
-#     return np.array([np.exp(inputs)[i] / np.sum(np.exp(inputs), axis=1)[i] for i in range(len(inputs))])
-
-def activation_softmax(inputs):
-    return np.divide(np.exp(inputs).T, np.sum(np.exp(inputs).T, axis=0)).T
+def mean_squared_error(output, expected):
+    """
+    Method to calculate loss using mean squared error \n
+    - Expected output should be provided using one hot encoding and have the same shape as the output
+    - Should only be used with a probability distribution (i.e. softmax)
+    """
+    return np.mean(np.square(output - expected))
 
 
 np.set_printoptions(precision=4, suppress=True)
 
-arr1 = np.array([3, 4, 5])
-arr2 = np.array([1, 2, 1])
-print(np.square(arr1 - arr2) / len(arr1))
+arr1 = np.array([0.2, 0.6, 0.2])
+arr2 = np.array([0.7, 0.1, 0.2])
+arr3 = np.array([[0.2, 0.6, 0.2], [0.7, 0.1, 0.2]])
+expected = np.array([[0, 1, 0], [0, 1, 0]])
+print(mean_squared_error(arr1, expected[0]))
+print(np.mean(np.square(arr3 - expected), axis=1))
+
+
+# print(cross_entropy(arr1, expected))
+# print(cross_entropy(arr2, expected))
 
 # arr = np.array([[-1, 0.25, 1.2], [3, 5.6, 9]])
 # arr = np.array([-1, 0.25, 1.2])

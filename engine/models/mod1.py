@@ -10,8 +10,7 @@ class Layer:
 
     def calc(self, inputs):
         """
-        Method to calculate neuron values (inputs * weights + biases)
-        before activation functions
+        Method to calculate neuron values (inputs * weights + biases) before activation functions
         """
         return np.dot(inputs, self.weights) + self.biases
 
@@ -53,22 +52,26 @@ class Loss:
     Class containing different loss functions
     # TODO: Implement other loss functions that might be beneficial
     """
+
     @staticmethod
     def cross_entropy(output, expected):
         """
         Method to calculate categorical cross entropy loss \n
         - Expected output should be provided using one hot encoding and have the same shape as the output
+        - Only functional with batches of data
         """
-        return -np.sum(np.array([expected[x] * np.log(output[x]) for x in range(len(expected))]))
+        # Unoptimized version:
+        # return -np.sum(np.array([expected[x] * np.log(output[x]) for x in range(len(expected))])) / len(output)
+        return np.mean(-np.log(np.sum(output * expected, axis=1)))
 
     @staticmethod
     def mean_squared_error(output, expected):
         """
         Method to calculate loss using mean squared error \n
-        - Expected output should be provided using one hot encoding and have the same shape as the output \n
+        - Expected output should be provided using one hot encoding and have the same shape as the output
         - Should only be used with a probability distribution (i.e. softmax)
         """
-        return np.square(output - expected) / len(expected)
+        return np.mean(np.square(output - expected))
 
 
 # i = np.array([[1, 2, 3, 4, 5, 6], [1, 2, 3, 4, 5, 6]])
