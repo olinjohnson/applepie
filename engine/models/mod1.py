@@ -1,110 +1,103 @@
 import numpy as np
-import matplotlib as plt
-from keras.datasets import mnist
+from engine.util import HiddenLayer, Softmax, Loss
 
+# model = [
+#     HiddenLayer(2, 2),
+#     Softmax(2, 1)
+# ]
+#
+# inputs = np.array([
+#     [0, 0],
+#     [0, 1],
+#     [1, 1],
+#     [1, 0],
+# ], dtype=float)
+#
+# fpl0 = model[0].activation_relu(inputs)
+# ol0 = model[1].activation_softmax(fpl0)
+# print(ol0)
 
 class Layer:
     def __init__(self, inputs, outputs):
-        self.weights = np.random.rand(inputs, outputs)
-        self.biases = np.random.rand(outputs)
+        self.weights = 2 * np.random.rand(outputs, inputs) - 1
+        self.biases = 2 * np.random.rand(outputs) - 1
 
     def calc(self, inputs):
-        """
-        Method to calculate neuron values (inputs * weights + biases) before activation functions
-        """
-        return np.dot(inputs, self.weights) + self.biases
+        # TODO: fix biases
+        return np.dot(inputs, self.weights.T) + self.biases
 
-
-class HiddenLayer(Layer):
-    """
-    Child class of Layer to represent hidden layers of a neural network
-    """
     def activation_relu(self, inputs):
-        """ReLU activation function"""
-        return np.maximum(self.calc(inputs), 0)
+        return np.maximum(inputs, 0)
+
+    def activation_softmax(self, inputs):
+        i_exp = np.exp(inputs)
+        s = np.sum(i_exp, axis=1)
+        return np.divide(i_exp.T, s).T
 
     def activation_sigmoid(self, inputs):
-        """Sigmoid activation function"""
-        # TODO: Fix vanishing gradient problem
-        # TODO: Optimize
-        return [1 / (1 + np.exp(-x)) for x in self.calc(inputs)]
-
-    def activation_tanh(self, inputs):
-        """tanh activation function"""
-        # TODO: Fix vanishing gradient problem
-        c = self.calc(inputs)
-        ei, eni = np.exp(c), np.exp(-c)
-        return (ei - eni) / (ei + eni)
-
-
-class Softmax(Layer):
-    """
-    Child class of Layer to represent the output layer of a neural network
-    """
-    def activation_softmax(self, inputs):
-        """Softmax activation function"""
-        inext = np.exp(self.calc(inputs)).T
-        return np.divide(inext, np.sum(inext, axis=0)).T
-
-
-class Loss:
-    """
-    Class containing different loss functions
-    # TODO: Implement other loss functions that might be beneficial
-    """
+        return 1 / (np.exp(-inputs) + 1)
 
     @staticmethod
-    def cross_entropy(output, expected):
-        """
-        Method to calculate categorical cross entropy loss \n
-        - Expected output should be provided using one hot encoding and have the same shape as the output
-        - Only functional with batches of data
-        """
-        # Unoptimized version:
-        # return -np.sum(np.array([expected[x] * np.log(output[x]) for x in range(len(expected))])) / len(output)
-        return np.mean(-np.log(np.sum(output * expected, axis=1)))
-
-    @staticmethod
-    def mean_squared_error(output, expected):
-        """
-        Method to calculate loss using mean squared error \n
-        - Expected output should be provided using one hot encoding and have the same shape as the output
-        - Should only be used with a probability distribution (i.e. softmax)
-        """
-        return np.mean(np.square(output - expected))
+    def loss_mse(output, expected):
+        squares = np.power(output - expected, 2)
+        return np.mean(squares)
 
 
-# i = np.array([[1, 2, 3, 4, 5, 6], [1, 2, 3, 4, 5, 6]])
-i = np.array([1, 2, 3, 4, 5, 6])
+inputs = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
+expected = np.array([[0], [1], [1], [0]])
 
-model = [
-    HiddenLayer(6, 2),
-    HiddenLayer(2, 3),
-    Softmax(3, 5),
-]
+l1 = Layer(2, 2)
+ol1 = Layer(2, 1)
 
-ff1 = model[0].activation_relu(i)
-ff2 = model[1].activation_relu(ff1)
-o = model[2].activation_softmax(ff2)
+lr = 0.5
+num_epochs = 500
 
-np.set_printoptions(precision=4, suppress=True)
-print(o)
-print(np.sum(o))
+def forward_prop():
+    z1 = l1.calc(inputs)
+    a1 = l1.activation_sigmoid(z1)
+    z2 = ol1.calc(a1)
+    a2 = ol1.activation_sigmoid(z2)
+    return Layer.loss_mse(a2, expected), {"z1": z1, "a1": a1, "z2": z2, "a2": a2}
 
-# s1 = Softmax()
-# print(s1.activationSoftmax(np.array([3.2, 1.3, 0.2, 0.8])))
-#
-# test = np.array([[1, 2, 3],[4, 5, 6]])
-# print(np.rot90(test))
-#
-#
-# self.weights = np.array(
-# [
-#         [0.88319202, 0.04940545],
-#         [0.85332121, 0.04842534],
-#         [0.5040203,  0.93099412],
-#         [0.27177196, 0.15110668],
-#         [0.21589597, 0.10006434],
-#         [0.97635271, 0.67171663]
-#     ]
-# )
+
+def back_prop(cache):
+
+    dca2 = 2 * (cache["a2"] - expected)
+    da2z2 = cache["a2"] * (1 - cache["a2"])
+
+    # print("DCA2: \n", dca2)
+    # print("DA2Z2: \n", da2z2)
+    # print("CACHE A1: \n", cache["a1"])
+    # print("Z2/A2 WEIGHTS: \n", ol1.weights)
+
+    dw2 = np.expand_dims(np.mean(cache["a1"] * da2z2 * dca2, axis=0), axis=0)
+    db1 = np.dot(np.mean(dca2 * da2z2), np.array([[1, 1]])).flatten()
+
+    # print("DW2: \n", dw2)
+    # print("WEIGHTS 2 \n", ol1.weights)
+    # print("DB1: \n", db1)
+    # print("BIASES: \n", l1.biases)
+
+    dz2a1 = np.dot(dca2 * da2z2, ol1.weights)
+    da1z1 = cache["a1"] * (1 - cache["a1"]) * dz2a1
+    dw1 = np.dot(da1z1.T, inputs) / len(inputs)
+    # print("DA1Z1: \n", da1z1)
+    # print("INPUTS: \n", inputs)
+    # print("WEIGHTS: \n", l1.weights)
+    # print("DW1: \n", dw1)
+
+    ol1.weights = dw2 * -1 * lr
+    l1.biases = db1 * -1 * lr
+    l1.weights = dw1 * -1 * lr
+
+
+loss, c = forward_prop()
+print("ORIGINAL LOSS: ", loss)
+
+for i in range(0, num_epochs):
+    back_prop(c)
+    loss, c = forward_prop()
+
+print("END LOSS: ", loss)
+
+
