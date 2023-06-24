@@ -47,5 +47,8 @@ a2 = np.array([[1, 1], [2, 2], [3, 3], [4, 4]])
 
 a3 = np.array([[2], [3], [4], [5]])
 a4 = np.array([[1, 5], [2, 6], [3, 7], [4, 8]])
-print(np.greater(a4, 4) * 1)
+# print(np.greater(a4, 4) * 1)
 
+a5 = np.array([[1, 1], [2, 2], [3, 3], [4, 4]])
+a6 = np.array([1, 2])
+print(a5 * a6)

@@ -42,21 +42,14 @@ def derivative_relu(x):
 def derivative_leaky_relu(x):
     return np.where(x > 0, 1, 0.01)
 
-LEARNING_RATE = 0.2
-NUM_EPOCHS = 20000
 
 inputs = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
 # Remember one hot? is this the correct input format?
 expected = np.array([[0], [1], [1], [0]])
 
-model = [
-    Layer(2, 2),
-    Layer(2, 1)
-]
-
-def forward_prop():
+def forward_prop(model):
     z0 = model[0].calc(inputs)
-    a0 = Layer.activation_leaky_relu(z0)
+    a0 = Layer.activation_sigmoid(z0)
     z1 = model[1].calc(a0)
     a1 = Layer.activation_sigmoid(z1)
     loss = Layer.loss_mse(a1, expected)
@@ -65,49 +58,75 @@ def forward_prop():
     return loss, cache
 
 
-def back_prop(cache):
+def back_prop(model, cache):
 
     dca1 = 2 * (cache["a1"] - expected)
     da1z1 = derivative_sigmoid(cache["a1"])
     dz1w1 = cache["a0"]
 
     dz1a0 = model[1].weights
-    da0z0 = derivative_leaky_relu(cache["a0"])
+    da0z0 = derivative_sigmoid(cache["a0"])
     dz0w0 = inputs
 
     dcb1 = np.mean(dca1 * da1z1, axis=0)
     model[1].biases -= (dcb1 * LEARNING_RATE)
 
-    dcw1 = np.mean(dca1 * da1z1 * dz1w1, axis=0)
+    dcw1 = np.dot((dca1 * da1z1).T, dz1w1) / len(dca1 * da1z1)  # <- batch size
     model[1].weights -= (dcw1 * LEARNING_RATE)
 
     dcb0 = np.mean(dca1 * da1z1 * dz1a0 * da0z0, axis=0)
     model[0].biases -= (dcb0 * LEARNING_RATE)
 
-    dcw0 = np.mean(dca1 * da1z1 * dz1a0 * da0z0 * dz0w0, axis=0)
+    dca0 = np.dot((dca1 * da1z1), dz1a0) / len(dca1)
+    dcw0 = np.dot((dca0 * da0z0).T, dz0w0) / len(dca0 * da0z0)
     model[0].weights -= (dcw0 * LEARNING_RATE)
 
 
-l, c = forward_prop()
-print("LOSS: ", l)
-# print("CACHE: \n", cache)
-losses = []
-for i in range(0, NUM_EPOCHS):
-    # p = numpy.random.permutation(len(inputs))
-    # inputs = inputs[p]
-    # expected = expected[p]
-    l, c = forward_prop()
-    losses.append(l)
-    back_prop(c)
+def train_data(num_iters):
+    print(f'Beginning {num_iters} training iterations...')
+    losses = []
+    differentials = []
+    for x in range(0, num_iters):
+        model = [
+            Layer(2, 3),
+            Layer(3, 1)
+        ]
+        losses.append([])
+        l, c = forward_prop(model)
+        il = l
+        for i in range(0, NUM_EPOCHS):
+            l, c = forward_prop(model)
+            losses[x].append(l)
+            back_prop(model, c)
+        l, c = forward_prop(model)
+        differentials.append(il - l)
+        print(f'Finished training set {x}...Continuing')
+    print(f'Finished {num_iters} training iterations...Plotting data\n')
+    return losses, differentials
 
-print("LOSS: ", l)
-inputs = [[1, 1], [0, 0], [1, 0], [0, 1]]
-expected = [[0], [0], [1], [1]]
-l, c = forward_prop()
-print(np.round(c["a1"]))
+LEARNING_RATE = 0.2
+NUM_EPOCHS = 20000
+NUM_TRAIN_ITERS = 10
 
-plt.plot([x for x in range(0, len(losses))], [x for x in losses])
-plt.title("learning rate: " + str(LEARNING_RATE))
-plt.xlabel("num epochs")
-plt.ylabel("mean network MSE loss")
+loss, diff = train_data(NUM_TRAIN_ITERS)
+
+print("Loss differentials:")
+for i in range(0, len(diff)):
+    print(f'Iteration {i} differential: {diff[i]}')
+
+fig = plt.figure(figsize=(9, 16))
+grid = plt.GridSpec(7, 2, wspace=0.3, hspace=0.6)
+for i in range(0, 5):
+    for x in range(0, 2):
+        sp = plt.subplot(grid[i, x])
+        sp.set_title(f'Iteration {i*2+x} loss')
+        sp.set_ylim(0.0, 0.7)
+        sp.plot([x for x in range(0, len(loss[i*2+x]))], [x for x in loss[i*2+x]])
+
+sp = plt.subplot(grid[5:7, :2])
+# sp.bar([x for x in range(0, NUM_TRAIN_ITERS)], diff)
+sp.bar([x for x in range(0, NUM_TRAIN_ITERS)], [x[-1] for x in loss])
+sp.set_title("Final Losses")
+sp.set_ylim(0, 0.5)
 plt.show()
+print("\nFinished plotting data")
