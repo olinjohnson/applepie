@@ -47,5 +47,5 @@ a2 = np.array([[1, 1], [2, 2], [3, 3], [4, 4]])
 
 a3 = np.array([[2], [3], [4], [5]])
 a4 = np.array([[1, 5], [2, 6], [3, 7], [4, 8]])
-p = np.random.permutation(len(a4))
+print(np.greater(a4, 4) * 1)
 
