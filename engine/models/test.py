@@ -45,7 +45,7 @@ import numpy as np
 a = np.array([[1], [2], [3], [4]])
 a2 = np.array([[1, 1], [2, 2], [3, 3], [4, 4]])
 
-
 a3 = np.array([[2], [3], [4], [5]])
 a4 = np.array([[1, 5], [2, 6], [3, 7], [4, 8]])
-print(np.expand_dims(np.mean(a4, axis=0), axis=0))
+p = np.random.permutation(len(a4))
+
