@@ -29,12 +29,21 @@ class Layer:
         return 1 / (np.exp(-inputs) + 1)
 
     @staticmethod
+    def activation_tanh(inputs):
+        numer = np.exp(inputs) - np.exp(-inputs)
+        denom = np.exp(inputs) + np.exp(-inputs)
+        return numer / denom
+
+    @staticmethod
     def loss_mse(output, expected):
         squares = (output - expected) ** 2
         return np.sum(squares) / len(expected)
 
 def derivative_sigmoid(x):
     return x * (1 - x)
+
+def derivative_tanh(x):
+    return 1 - (x ** 2)
 
 def derivative_relu(x):
     return np.greater(x, 0) * 1
@@ -49,7 +58,7 @@ expected = np.array([[0], [1], [1], [0]])
 
 def forward_prop(model):
     z0 = model[0].calc(inputs)
-    a0 = Layer.activation_sigmoid(z0)
+    a0 = Layer.activation_tanh(z0)
     z1 = model[1].calc(a0)
     a1 = Layer.activation_sigmoid(z1)
     loss = Layer.loss_mse(a1, expected)
@@ -65,7 +74,7 @@ def back_prop(model, cache):
     dz1w1 = cache["a0"]
 
     dz1a0 = model[1].weights
-    da0z0 = derivative_sigmoid(cache["a0"])
+    da0z0 = derivative_tanh(cache["a0"])
     dz0w0 = inputs
 
     dcb1 = np.mean(dca1 * da1z1, axis=0)
